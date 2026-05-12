@@ -45,7 +45,7 @@ Each quiz is 30 questions and takes about 15–25 minutes.
 Clone or download, then double-click any `.html` file in the `quizzes/` folder. Works in any modern browser, fully offline.
 
 ```bash
-git clone https://github.com/YOUR-USERNAME/python-study-toolkit.git
+git clone https://github.com/Kwilco425/python-study-toolkit.git
 cd python-study-toolkit
 open quizzes/01-python-foundations.html      # macOS
 xdg-open quizzes/01-python-foundations.html  # Linux
@@ -57,7 +57,7 @@ start quizzes/01-python-foundations.html     # Windows
 Push to GitHub, enable Pages in Settings, and your quizzes become playable from any URL like:
 
 ```
-https://YOUR-USERNAME.github.io/python-study-toolkit/quizzes/01-python-foundations.html
+https://Kwilco425.github.io/python-study-toolkit/quizzes/01-python-foundations.html
 ```
 
 No setup beyond flipping the Pages toggle in your repo settings.
