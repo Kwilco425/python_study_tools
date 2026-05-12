@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python Study Toolkit</title>
+<meta name="description" content="Interactive Python practice quizzes with code editor, score tracking, and topic-level feedback. Self-contained, no dependencies.">
+<style>
+  :root {
+    --bg: #0d1117;
+    --bg-card: #161b22;
+    --bg-card-2: #1c2128;
+    --border: #30363d;
+    --border-soft: #21262d;
+    --text: #e6edf3;
+    --text-dim: #8b949e;
+    --text-muted: #6e7681;
+    --purple: #bc8cff;
+    --teal: #56d4dd;
+    --amber: #f0b72f;
+    --green: #3fb950;
+    --pink: #ff7eb6;
+    --code-bg: #0a0e14;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+    background: var(--bg);
+    background-image:
+      radial-gradient(circle at 10% 10%, rgba(188, 140, 255, 0.10) 0%, transparent 40%),
+      radial-gradient(circle at 90% 80%, rgba(86, 212, 221, 0.08) 0%, transparent 40%),
+      radial-gradient(circle at 50% 50%, rgba(240, 183, 47, 0.04) 0%, transparent 40%);
+    color: var(--text);
+    line-height: 1.7;
+    min-height: 100vh;
+    padding: 40px 16px;
+  }
+  .container { max-width: 880px; margin: 0 auto; }
+
+  /* HERO */
+  .hero {
+    text-align: center;
+    padding: 40px 20px 50px;
+    border: 1px solid var(--border);
+    background: var(--bg-card);
+    border-radius: 12px;
+    margin-bottom: 32px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--purple), var(--teal), var(--amber), var(--green));
+  }
+  .hero h1 {
+    font-size: 28px;
+    color: var(--text);
+    margin-bottom: 12px;
+    letter-spacing: -0.5px;
+  }
+  .hero .tagline {
+    font-size: 14px;
+    color: var(--text-dim);
+    max-width: 540px;
+    margin: 0 auto 20px;
+  }
+  .badges {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 18px;
+  }
+  .badge {
+    font-size: 11px;
+    padding: 4px 10px;
+    background: var(--bg-card-2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    color: var(--text-dim);
+    letter-spacing: 0.5px;
+  }
+  .badge.green { color: var(--green); border-color: rgba(63, 185, 80, 0.3); }
+  .badge.purple { color: var(--purple); border-color: rgba(188, 140, 255, 0.3); }
+  .badge.teal { color: var(--teal); border-color: rgba(86, 212, 221, 0.3); }
+
+  /* SECTION */
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+    padding-left: 4px;
+  }
+  .section-header h2 {
+    font-size: 13px;
+    color: var(--amber);
+    letter-spacing: 2px;
+    font-weight: bold;
+  }
+  .section-header .line {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, var(--amber), transparent);
+  }
+
+  /* QUIZ CARDS */
+  .quiz-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 14px;
+    margin-bottom: 36px;
+  }
+  .quiz-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px 22px;
+    text-decoration: none;
+    color: var(--text);
+    display: block;
+    transition: all 0.18s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .quiz-card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0;
+    width: 3px;
+    height: 100%;
+    background: var(--accent, var(--purple));
+    transition: width 0.2s ease;
+  }
+  .quiz-card:hover {
+    transform: translateX(4px);
+    background: var(--bg-card-2);
+    border-color: var(--accent, var(--purple));
+  }
+  .quiz-card:hover::before {
+    width: 5px;
+  }
+  .quiz-card.purple { --accent: var(--purple); }
+  .quiz-card.teal { --accent: var(--teal); }
+  .quiz-card.amber { --accent: var(--amber); }
+  .quiz-card.green { --accent: var(--green); }
+  .quiz-card.pink { --accent: var(--pink); }
+
+  .quiz-number {
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 2px;
+    font-weight: bold;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+  }
+  .quiz-title {
+    font-size: 16px;
+    color: var(--text);
+    margin-bottom: 6px;
+    font-weight: bold;
+  }
+  .quiz-topics {
+    font-size: 12px;
+    color: var(--text-dim);
+    line-height: 1.6;
+  }
+  .quiz-meta {
+    display: flex;
+    gap: 16px;
+    margin-top: 10px;
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+  .quiz-meta span::before { content: '· '; }
+  .quiz-meta span:first-child::before { content: ''; }
+
+  /* FEATURES */
+  .features {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 22px 26px;
+    margin-bottom: 32px;
+  }
+  .features h3 {
+    font-size: 14px;
+    color: var(--teal);
+    margin-bottom: 14px;
+    letter-spacing: 1px;
+  }
+  .feature-list {
+    list-style: none;
+    padding: 0;
+  }
+  .feature-list li {
+    padding: 5px 0 5px 22px;
+    font-size: 13px;
+    color: var(--text);
+    position: relative;
+    line-height: 1.7;
+  }
+  .feature-list li::before {
+    content: '▸';
+    position: absolute;
+    left: 0;
+    color: var(--teal);
+  }
+  .feature-list code {
+    background: var(--code-bg);
+    color: var(--teal);
+    padding: 1px 5px;
+    border-radius: 2px;
+    font-size: 11px;
+    border: 1px solid var(--border-soft);
+  }
+
+  /* FOOTER */
+  footer {
+    text-align: center;
+    padding: 28px 16px;
+    color: var(--text-muted);
+    font-size: 12px;
+    border-top: 1px solid var(--border-soft);
+    margin-top: 20px;
+  }
+  footer a {
+    color: var(--teal);
+    text-decoration: none;
+  }
+  footer a:hover { color: var(--text); }
+
+  @media (max-width: 600px) {
+    body { padding: 20px 12px; }
+    .hero { padding: 28px 16px 36px; }
+    .hero h1 { font-size: 22px; }
+    .quiz-card, .features { padding: 16px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <section class="hero">
+    <h1>▣ Python Study Toolkit</h1>
+    <p class="tagline">Interactive Python practice quizzes with score tracking, memory tricks, and topic-level feedback. Built for active recall, not passive reading.</p>
+    <div class="badges">
+      <span class="badge green">5 quizzes</span>
+      <span class="badge purple">150+ questions</span>
+      <span class="badge teal">no dependencies</span>
+      <span class="badge">vanilla JS</span>
+      <span class="badge">MIT licensed</span>
+    </div>
+  </section>
+
+  <div class="section-header">
+    <h2>📋 PICK A QUIZ</h2>
+    <div class="line"></div>
+  </div>
+
+  <div class="quiz-grid">
+
+    <a href="quizzes/01-python-foundations.html" class="quiz-card purple">
+      <div class="quiz-number">QUIZ 01 · FOUNDATIONS</div>
+      <div class="quiz-title">Python Foundations · Multiple choice + write code</div>
+      <div class="quiz-topics">Types, loops, slicing, conditionals, plus typed-in code questions graded against real test cases — write your function in an in-browser editor.</div>
+      <div class="quiz-meta">
+        <span>30 questions</span>
+        <span>~25 min</span>
+        <span>code editor</span>
+      </div>
+    </a>
+
+    <a href="quizzes/02-python-syntax-round1.html" class="quiz-card teal">
+      <div class="quiz-number">QUIZ 02 · SYNTAX · ROUND 1</div>
+      <div class="quiz-title">Variables, Types, Strings, Slicing, Booleans</div>
+      <div class="quiz-topics">Multi-assignment, unpacking, scope, type conversion, f-strings, slicing with start/stop/step, truthy/falsy traps, operators including <code>is</code> vs <code>==</code>.</div>
+      <div class="quiz-meta">
+        <span>30 questions</span>
+        <span>~20 min</span>
+        <span>halfway check</span>
+      </div>
+    </a>
+
+    <a href="quizzes/03-python-syntax-round2.html" class="quiz-card teal">
+      <div class="quiz-number">QUIZ 03 · SYNTAX · ROUND 2</div>
+      <div class="quiz-title">String Methods, Formatting, Alignment</div>
+      <div class="quiz-topics"><code>.capitalize()</code>, <code>.title()</code>, <code>.strip()</code>, <code>.count()</code>, <code>.replace()</code>, <code>.join()</code>; positional vs named vs index-based <code>.format()</code>; number formatting; left/right/center alignment.</div>
+      <div class="quiz-meta">
+        <span>30 questions</span>
+        <span>~20 min</span>
+        <span>halfway check</span>
+      </div>
+    </a>
+
+    <a href="quizzes/04-python-paradigms-and-builtins.html" class="quiz-card amber">
+      <div class="quiz-number">QUIZ 04 · PARADIGMS &amp; BUILT-INS</div>
+      <div class="quiz-title">Paradigms, IDEs, Built-in Functions</div>
+      <div class="quiz-topics">Imperative, OOP, functional, declarative paradigms; built-ins like <code>len</code>, <code>type</code>, <code>sum</code>, <code>range</code>, <code>sorted</code>, <code>any</code>/<code>all</code>; variables, scope, problem-solving process.</div>
+      <div class="quiz-meta">
+        <span>30 questions</span>
+        <span>~20 min</span>
+        <span>halfway check</span>
+      </div>
+    </a>
+
+    <a href="quizzes/05-data-structures.html" class="quiz-card green">
+      <div class="quiz-number">QUIZ 05 · DATA STRUCTURES</div>
+      <div class="quiz-title">Lists, Tuples, Sets, Dictionaries</div>
+      <div class="quiz-topics">Mutable vs immutable, indexing &amp; negative indexing; full list method suite (<code>append</code>, <code>extend</code>, <code>insert</code>, <code>pop</code>, <code>del</code>, <code>clear</code>); set <code>.add</code> vs <code>.remove</code> vs <code>.discard</code>; dict <code>.update</code>, <code>.pop</code>, <code>.clear</code>; when to use each.</div>
+      <div class="quiz-meta">
+        <span>30 questions</span>
+        <span>~20 min</span>
+        <span>halfway check</span>
+      </div>
+    </a>
+
+  </div>
+
+  <div class="section-header">
+    <h2>✨ WHAT MAKES THESE DIFFERENT</h2>
+    <div class="line"></div>
+  </div>
+
+  <div class="features">
+    <ul class="feature-list">
+      <li><strong>Memory tricks for every question.</strong> Not just an explanation — a phrase or mnemonic to help the concept actually stick.</li>
+      <li><strong>Mistakes are first-class.</strong> Get one wrong? You see your answer in red, the correct answer in green, with a plain-English explanation and the memory trick.</li>
+      <li><strong>Topic-level feedback.</strong> The final report breaks results down by topic and generates a targeted study guide based on what you actually missed.</li>
+      <li><strong>Halfway check-in</strong> at question 15 so you can pace yourself.</li>
+      <li><strong>Code editor for code questions</strong> (quiz 01) — write actual Python, get graded against real test cases. The grader translates Python to JS at runtime, no Python runtime needed in the browser.</li>
+      <li><strong>Zero dependencies.</strong> One HTML file per quiz. No build step, no CDN, no internet required after download. Run them anywhere.</li>
+      <li><strong>Mobile responsive</strong> — study on your phone if you want.</li>
+    </ul>
+  </div>
+
+  <footer>
+    Built by Dee · <a href="https://github.com/YOUR-USERNAME/python-study-toolkit">View on GitHub</a> · MIT Licensed
+  </footer>
+
+</div>
+</body>
+</html>
