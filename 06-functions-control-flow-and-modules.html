@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python Functions, Control Flow, and Modules</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --bg-card: #161b22;
+    --bg-card-2: #1c2128;
+    --border: #30363d;
+    --border-soft: #21262d;
+    --text: #e6edf3;
+    --text-dim: #8b949e;
+    --text-muted: #6e7681;
+    --purple: #bc8cff;
+    --teal: #56d4dd;
+    --amber: #f0b72f;
+    --green: #3fb950;
+    --red: #f85149;
+    --pink: #ff7eb6;
+    --code-bg: #0a0e14;
+    --shadow: 0 8px 24px rgba(0,0,0,0.4);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+    background: var(--bg);
+    background-image:
+      radial-gradient(circle at 20% 10%, rgba(255, 126, 182, 0.08) 0%, transparent 40%),
+      radial-gradient(circle at 80% 80%, rgba(188, 140, 255, 0.06) 0%, transparent 40%);
+    color: var(--text);
+    line-height: 1.6;
+    min-height: 100vh;
+    padding: 24px 16px;
+  }
+  .container { max-width: 880px; margin: 0 auto; }
+  header {
+    border: 1px solid var(--border);
+    background: var(--bg-card);
+    border-radius: 8px;
+    padding: 20px 24px;
+    margin-bottom: 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  header::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 4px; height: 100%;
+    background: linear-gradient(180deg, var(--pink), var(--purple));
+  }
+  header h1 { font-size: 18px; color: var(--pink); margin-bottom: 4px; letter-spacing: 0.5px; }
+  header p { font-size: 13px; color: var(--text-dim); }
+  .header-meta {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-top: 12px; flex-wrap: wrap; gap: 12px;
+  }
+  .progress-info { font-size: 12px; color: var(--text-muted); }
+  .score-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 6px 12px;
+    background: var(--bg-card-2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    font-size: 12px;
+  }
+  .score-badge .label { color: var(--text-muted); }
+  .score-badge .value { color: var(--pink); font-weight: bold; }
+  .progress-bar {
+    width: 100%; height: 4px;
+    background: var(--bg-card-2);
+    border-radius: 2px;
+    margin-top: 12px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--pink), var(--purple));
+    transition: width 0.3s ease;
+    border-radius: 2px;
+  }
+  .question-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 24px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow);
+  }
+  .q-number {
+    display: inline-block;
+    color: var(--pink);
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+  }
+  .q-topic {
+    display: inline-block;
+    margin-left: 10px;
+    color: var(--text-muted);
+    font-size: 11px;
+    padding: 2px 8px;
+    background: var(--bg-card-2);
+    border: 1px solid var(--border-soft);
+    border-radius: 3px;
+  }
+  .q-text {
+    font-size: 15px; color: var(--text);
+    margin-bottom: 12px; line-height: 1.7;
+  }
+  .q-text code, .feedback code, .option code {
+    background: var(--code-bg);
+    color: var(--teal);
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 12px;
+    border: 1px solid var(--border-soft);
+  }
+  pre.code-block {
+    background: var(--code-bg);
+    border: 1px solid var(--border-soft);
+    border-left: 3px solid var(--pink);
+    padding: 14px 16px;
+    border-radius: 4px;
+    overflow-x: auto;
+    margin: 12px 0;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--text);
+    white-space: pre;
+  }
+  .options { display: flex; flex-direction: column; gap: 8px; margin-top: 16px; }
+  .option {
+    background: var(--bg-card-2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 12px 16px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    font-size: 14px;
+    color: var(--text);
+    text-align: left;
+    width: 100%;
+    font-family: inherit;
+  }
+  .option:hover:not(:disabled) {
+    border-color: var(--pink);
+    background: rgba(255, 126, 182, 0.05);
+    transform: translateX(2px);
+  }
+  .option:disabled { cursor: not-allowed; }
+  .option .letter { color: var(--pink); font-weight: bold; flex-shrink: 0; min-width: 18px; }
+  .option.correct { border-color: var(--green); background: rgba(63, 185, 80, 0.15); }
+  .option.correct .letter { color: var(--green); }
+  .option.incorrect { border-color: var(--red); background: rgba(248, 81, 73, 0.1); }
+  .option.incorrect .letter { color: var(--red); }
+  .option.faded { opacity: 0.4; }
+  .feedback {
+    margin-top: 18px;
+    padding: 16px;
+    border-radius: 6px;
+    border-left: 4px solid;
+    animation: slideIn 0.3s ease;
+  }
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(-6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .feedback.correct { background: rgba(63, 185, 80, 0.08); border-color: var(--green); }
+  .feedback.incorrect { background: rgba(248, 81, 73, 0.08); border-color: var(--red); }
+  .feedback-header { font-weight: bold; margin-bottom: 8px; font-size: 14px; letter-spacing: 0.5px; }
+  .feedback.correct .feedback-header { color: var(--green); }
+  .feedback.incorrect .feedback-header { color: var(--red); }
+  .feedback-body { font-size: 13px; color: var(--text); line-height: 1.7; }
+  .feedback-body strong { color: var(--amber); }
+  .memory-trick {
+    margin-top: 12px;
+    padding: 10px 14px;
+    background: rgba(240, 183, 47, 0.08);
+    border-left: 3px solid var(--amber);
+    border-radius: 3px;
+    font-size: 12px;
+    color: var(--text);
+  }
+  .memory-trick .label {
+    color: var(--amber); font-weight: bold; letter-spacing: 1px;
+    font-size: 10px; display: block; margin-bottom: 4px;
+  }
+  .next-btn {
+    background: var(--pink);
+    color: var(--bg);
+    border: none;
+    padding: 10px 24px;
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 14px;
+    letter-spacing: 0.5px;
+    transition: all 0.15s ease;
+  }
+  .next-btn:hover { background: #ff9bc5; transform: translateY(-1px); }
+  .summary-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 28px;
+    margin-bottom: 20px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .summary-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--pink), var(--purple), var(--teal));
+  }
+  .summary-card h2 { color: var(--pink); font-size: 20px; margin-bottom: 12px; }
+  .big-score {
+    font-size: 56px; font-weight: bold;
+    color: var(--pink); margin: 16px 0;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .percent { font-size: 22px; color: var(--amber); margin-bottom: 16px; }
+  .section {
+    text-align: left;
+    margin-top: 20px;
+    padding: 16px;
+    background: var(--bg-card-2);
+    border-radius: 6px;
+    border: 1px solid var(--border-soft);
+  }
+  .section h3 {
+    font-size: 13px; color: var(--amber); margin-bottom: 10px; letter-spacing: 1px;
+  }
+  .section ul { list-style: none; padding: 0; }
+  .section ul li {
+    padding: 6px 0 6px 18px;
+    font-size: 13px;
+    position: relative;
+    color: var(--text);
+  }
+  .section ul li::before {
+    content: '▸';
+    position: absolute;
+    left: 0;
+    color: var(--pink);
+  }
+  .restart-btn {
+    background: transparent;
+    color: var(--amber);
+    border: 1px solid var(--amber);
+    padding: 10px 20px;
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 12px;
+    cursor: pointer;
+    margin-top: 20px;
+    letter-spacing: 1px;
+  }
+  .restart-btn:hover { background: var(--amber); color: var(--bg); }
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--pink); }
+  @media (max-width: 600px) {
+    body { padding: 12px 8px; }
+    .question-card, .summary-card, header { padding: 16px; }
+    .big-score { font-size: 42px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <h1>▣ Python Functions, Control Flow, and Modules</h1>
+  <p>Functions · Control Flow · Errors · Debugging · Files · Modules · 30 questions</p>
+  <div class="header-meta">
+    <span class="progress-info" id="progressInfo">Question 1 of 30</span>
+    <span class="score-badge"><span class="label">SCORE</span><span class="value" id="scoreDisplay">0 / 0</span></span>
+  </div>
+  <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width: 0%"></div></div>
+</header>
+
+<div id="quizArea"></div>
+
+</div>
+
+<script>
+const questions = [
+  // Q1 — correct: B
+  { topic: "Functions",
+    q: `Which keyword starts a function definition in Python?`,
+    options: [
+      "<code>function</code>",
+      "<code>def</code>",
+      "<code>func</code>",
+      "<code>define</code>",
+    ],
+    correct: 1,
+    explain: "Python uses <code>def</code> followed by the function name, parentheses (with optional parameters), and a colon. Other languages use <code>function</code> or <code>func</code> — Python doesn't.",
+    trick: "<b>'def = define a function.'</b> Three letters, every time."
+  },
+  // Q2 — correct: D
+  { topic: "Functions",
+    q: `In <code>def greet(name): return "Hi " + name</code>, what is <code>name</code>?`,
+    options: [
+      "A return value",
+      "An argument",
+      "A keyword",
+      "A parameter (placeholder in the definition)",
+    ],
+    correct: 3,
+    explain: "<strong>Parameter</strong> = placeholder in the function DEFINITION. <strong>Argument</strong> = the actual VALUE you pass when CALLING the function. <code>greet(\"Dee\")</code> — 'Dee' is the argument.",
+    trick: "<b>'PARAMETER = Placeholder. ARGUMENT = Actual data.'</b> Same first letter as the role."
+  },
+  // Q3 — correct: C
+  { topic: "Functions",
+    q: `What happens to code AFTER a <code>return</code> statement inside a function?`,
+    options: [
+      "It runs in a separate thread",
+      "It still runs",
+      "It's ignored — return immediately exits the function",
+      "It causes a syntax error",
+    ],
+    correct: 2,
+    explain: "<code>return</code> exits the function immediately. Any code below it (inside that function) never runs. Useful for early exits / guard clauses.",
+    trick: "<b>'return = leave the building.'</b> Anything below it gets skipped."
+  },
+  // Q4 — correct: B
+  { topic: "Functions",
+    q: `In <code>def greet(name="World")</code>, what is <code>"World"</code>?`,
+    options: [
+      "A required argument",
+      "A default parameter value — used if the caller doesn't pass one",
+      "Just a comment",
+      "The function's return value",
+    ],
+    correct: 1,
+    explain: "Default values let you call the function with OR without that argument. <code>greet()</code> uses 'World'. <code>greet(\"Dee\")</code> uses 'Dee'. Defaults must come AFTER any required params.",
+    trick: "<b>'= value in the signature = optional with a backup.'</b>"
+  },
+  // Q5 — correct: C
+  { topic: "Functions",
+    q: `What's a 'keyword argument' (also called named argument)?`,
+    options: [
+      "Only a built-in function thing",
+      "An argument that's a Python keyword",
+      "An argument passed by writing <code>param=value</code> in the function call",
+      "An argument with a special @ symbol",
+    ],
+    correct: 2,
+    explain: "Keyword arguments name the parameter in the call: <code>greet(name=\"Dee\")</code>. Lets you skip parameter order. Compare with positional args: <code>greet(\"Dee\")</code> which goes by position.",
+    trick: "<b>'name=value in the call = keyword arg.'</b> Order stops mattering."
+  },
+  // Q6 — correct: C
+  { topic: "Functions",
+    q: `What does <code>*args</code> in a function definition do?`,
+    options: [
+      "Makes the argument optional",
+      "Pointer like in C",
+      "Lets the function accept ANY number of positional arguments (collected as a tuple)",
+      "Multiplies the arguments",
+    ],
+    correct: 2,
+    explain: "<code>*args</code> packs extra positional arguments into a tuple. <code>def f(*args): print(args)</code> — call <code>f(1, 2, 3)</code> and args is <code>(1, 2, 3)</code>. <code>**kwargs</code> does the same for keyword args (as a dict).",
+    trick: "<b>'* packs extras into a tuple. ** packs into a dict.'</b>"
+  },
+  // Q7 — correct: C
+  { topic: "Functions",
+    q: `What is function recursion?`,
+    options: [
+      "A function that runs forever",
+      "A function that errors",
+      "A function that CALLS ITSELF",
+      "A function with no return statement",
+    ],
+    correct: 2,
+    explain: "Recursion is when a function calls itself, usually with a 'smaller' version of the problem. Classic example: factorial. You need a BASE CASE to stop, or you get infinite recursion (RecursionError).",
+    trick: "<b>'Recursion = function calls itself.'</b> Always have a base case to stop."
+  },
+  // Q8 — correct: A
+  { topic: "Control flow",
+    q: `What does an <code>if</code> statement do?`,
+    options: [
+      "Runs a block of code ONLY when a condition is True",
+      "Loops a block of code",
+      "Imports a module",
+      "Defines a function",
+    ],
+    correct: 0,
+    explain: "<code>if condition:</code> runs its indented block only when the condition evaluates to True. No else needed — the if is fine on its own.",
+    trick: "<b>'if = run this when true.'</b>"
+  },
+  // Q9 — correct: D
+  { topic: "Control flow",
+    q: `What's <code>elif</code> short for?`,
+    options: [
+      "Equals if",
+      "Else loop",
+      "End if",
+      "Else if — checks another condition if the first if was False",
+    ],
+    correct: 3,
+    explain: "<code>elif</code> = 'else if'. Lets you chain multiple conditions: try the if, then the elif(s), then else as the fallback. Only ONE branch runs.",
+    trick: "<b>'elif = else if, smushed.'</b> Chain as many as you need."
+  },
+  // Q10 — correct: C
+  { topic: "Control flow",
+    q: `What runs?<pre class="code-block">x = 5
+if x > 10:
+    print("A")
+elif x > 3:
+    print("B")
+elif x > 0:
+    print("C")
+else:
+    print("D")</pre>`,
+    options: [
+      "B, C, and D",
+      "A",
+      "B",
+      "B and C",
+    ],
+    correct: 2,
+    explain: "Only ONE branch runs in an if/elif chain — the FIRST one that's True. <code>x &gt; 10</code> is False, <code>x &gt; 3</code> is True (5 IS &gt; 3), so 'B' prints and Python skips the rest.",
+    trick: "<b>'First True wins, the rest are skipped.'</b>"
+  },
+  // Q11 — correct: B
+  { topic: "Control flow",
+    q: `When should you use a <code>for</code> loop vs a <code>while</code> loop?`,
+    options: [
+      "for = unlimited times, while = limited",
+      "for = iterating over a sequence/known count, while = repeat until a condition flips",
+      "for = numbers only, while = strings only",
+      "They're identical",
+    ],
+    correct: 1,
+    explain: "<code>for</code> walks through an iterable (list, range, string, etc.). <code>while</code> keeps going as long as a condition is True — count unknown. Rule of thumb: for loops over things, while loops while things.",
+    trick: "<b>'for = walk through. while = keep going.'</b>"
+  },
+  // Q12 — correct: B
+  { topic: "Control flow",
+    q: `What does <code>break</code> do inside a loop?`,
+    options: [
+      "Skips just this iteration",
+      "Exits the loop immediately, no matter what",
+      "Pauses the loop for one second",
+      "Restarts the loop from the top",
+    ],
+    correct: 1,
+    explain: "<code>break</code> exits the loop completely and jumps to the code after it. Even if the loop has many iterations left, it's done. Use it when you've found what you need.",
+    trick: "<b>'break = jailbreak.'</b> Out of the loop, immediately."
+  },
+  // Q13 — correct: D
+  { topic: "Control flow",
+    q: `What does <code>continue</code> do inside a loop?`,
+    options: [
+      "Continues running after the loop",
+      "Exits the loop entirely",
+      "Pauses execution",
+      "Skips the REST of the current iteration and goes to the next one",
+    ],
+    correct: 3,
+    explain: "<code>continue</code> says 'skip the rest of this round, start the next iteration.' The loop itself keeps running — only the current pass is cut short.",
+    trick: "<b>'continue = skip this one, next!'</b> Loop keeps going."
+  },
+  // Q14 — correct: A
+  { topic: "Control flow",
+    q: `What does <code>pass</code> do?`,
+    options: [
+      "Nothing — it's a placeholder when syntax requires a statement but you don't want to do anything",
+      "Skips to the next loop iteration",
+      "Passes a value back",
+      "Same as break",
+    ],
+    correct: 0,
+    explain: "<code>pass</code> is a no-op — does literally nothing. Useful when you need a statement syntactically (empty function, empty class, empty <code>if</code>) but have no code yet. Different from <code>continue</code> which only works in loops.",
+    trick: "<b>'pass = placeholder. Does nothing on purpose.'</b>"
+  },
+  // Q15 — correct: D
+  { topic: "Errors",
+    q: `What's a runtime error?`,
+    options: [
+      "An error that prevents Python from starting",
+      "Any error caught by the interpreter before running",
+      "An error in your code's spelling",
+      "An error caused during execution — like dividing by zero, accessing a missing key, or reading a missing file",
+    ],
+    correct: 3,
+    explain: "Runtime errors happen WHILE the code is running. The syntax was fine, but something went wrong during execution: <code>ZeroDivisionError</code>, <code>FileNotFoundError</code>, <code>KeyError</code>, etc.",
+    trick: "<b>'Runtime = error happens AS the code runs.'</b>"
+  },
+  // Q16 — correct: A
+  { topic: "Errors",
+    q: `What's a semantic error?`,
+    options: [
+      "Code that runs without crashing but produces WRONG results — the LOGIC is broken",
+      "A typo",
+      "An error in the interpreter itself",
+      "A missing colon",
+    ],
+    correct: 0,
+    explain: "Semantic errors are the sneakiest. No crash, no error message — just wrong output because the logic is off. Example: <code>find_max</code> that returns the smaller number. These bugs need testing to catch.",
+    trick: "<b>'Semantic = silently wrong.'</b> The hardest kind to find."
+  },
+  // Q17 — correct: A
+  { topic: "Errors",
+    q: `What's a syntax error?`,
+    options: [
+      "Code that Python can't even PARSE — like a missing colon or mismatched parens",
+      "A logic error",
+      "Code that crashes during execution",
+      "A bug in the Python language itself",
+    ],
+    correct: 0,
+    explain: "Syntax errors happen BEFORE the code runs — Python rejects it for not being valid Python. Things like missing colons, mismatched quotes, or wrong indentation. Usually shows you the line.",
+    trick: "<b>'Syntax = code Python can\\'t even read.'</b> Caught before any execution."
+  },
+  // Q18 — correct: C
+  { topic: "Debugging",
+    q: `What's a reasonable debugging process?`,
+    options: [
+      "Random changes until it works",
+      "Delete the function and start over",
+      "Understand → isolate → use debugger or prints → fix → test the fix",
+      "Add try/except around everything",
+    ],
+    correct: 2,
+    explain: "Good debugging is systematic: (1) understand what's wrong, (2) narrow down where it's happening, (3) inspect the state (debugger or print statements), (4) make a targeted fix, (5) test that it actually fixed it.",
+    trick: "<b>'Understand → Isolate → Inspect → Fix → Test.'</b>"
+  },
+  // Q19 — correct: A
+  { topic: "Debugging",
+    q: `Why are <code>print()</code> statements useful for debugging?`,
+    options: [
+      "They show variable values at specific points so you can spot unexpected values or behavior",
+      "They automatically fix bugs",
+      "They prevent crashes",
+      "They speed up the code",
+    ],
+    correct: 0,
+    explain: "Drop a <code>print(my_var)</code> wherever you're confused. Seeing the actual value vs. what you expected often reveals the bug instantly. Crude but effective — and works everywhere.",
+    trick: "<b>'When in doubt, print it out.'</b>"
+  },
+  // Q20 — correct: A
+  { topic: "Debugging",
+    q: `What's the purpose of unit tests?`,
+    options: [
+      "To catch errors early and prevent regressions when you change code later",
+      "Required for Python to run",
+      "To make code prettier",
+      "To slow down development",
+    ],
+    correct: 0,
+    explain: "Unit tests check that small pieces of code (functions, methods) do what they're supposed to. Run them anytime you change code — if a test that used to pass now fails, you broke something.",
+    trick: "<b>'Tests = a safety net for your future self.'</b>"
+  },
+  // Q21 — correct: D
+  { topic: "Files",
+    q: `Which function opens a file in Python?`,
+    options: [
+      "<code>file()</code>",
+      "<code>load()</code>",
+      "<code>read()</code>",
+      "<code>open()</code>",
+    ],
+    correct: 3,
+    explain: "<code>open(filename, mode)</code> is the entry point. Modes: <code>'r'</code> read (default), <code>'w'</code> write (overwrites!), <code>'a'</code> append, <code>'b'</code> binary. After opening, you can <code>.read()</code>, <code>.write()</code>, then <code>.close()</code>.",
+    trick: "<b>'open() first, then read/write, then close.'</b>"
+  },
+  // Q22 — correct: B
+  { topic: "Files",
+    q: `What happens when you open a file in <code>'w'</code> (write) mode?`,
+    options: [
+      "It reads the file first, then lets you write",
+      "It OVERWRITES the file — any existing content is gone",
+      "It errors if the file already exists",
+      "It appends to the existing file",
+    ],
+    correct: 1,
+    explain: "<code>'w'</code> wipes the file clean before writing. If you want to add to an existing file without losing content, use <code>'a'</code> (append). This trap has wiped out many users' homework.",
+    trick: "<b>'w = WIPE then write. a = APPEND.'</b> Use a if you want to keep what's there."
+  },
+  // Q23 — correct: B
+  { topic: "Files",
+    q: `What's a binary file?`,
+    options: [
+      "A file with only 0s and 1s readable as text",
+      "A non-human-readable file (images, audio, executables) — data encoded in binary",
+      "A file that's only used for math",
+      "A backup file",
+    ],
+    correct: 1,
+    explain: "Binary files store data in a format computers can use directly — images, videos, PDFs, executables. You can't open them in a text editor meaningfully. Use mode <code>'rb'</code> or <code>'wb'</code>.",
+    trick: "<b>'Binary = not text. Use \\'rb\\'/\\'wb\\' to handle.'</b>"
+  },
+  // Q24 — correct: C
+  { topic: "Files",
+    q: `Why should you close files after using them?`,
+    options: [
+      "To compress the file",
+      "It's just stylistic — doesn't actually matter",
+      "To free resources and make sure all writes are saved to disk",
+      "Python deletes them otherwise",
+    ],
+    correct: 2,
+    explain: "Open files hold system resources. Writes may also be buffered — not actually saved until you close. Best practice: use <code>with open(...) as f:</code> which auto-closes when the block ends.",
+    trick: "<b>'open → use → close.'</b> Or use 'with' to auto-close."
+  },
+  // Q25 — correct: A
+  { topic: "Modules",
+    q: `What is a Python module?`,
+    options: [
+      "A file containing Python definitions and statements that can be imported",
+      "A specific function name",
+      "A built-in keyword",
+      "A type of variable",
+    ],
+    correct: 0,
+    explain: "A module is just a <code>.py</code> file. <code>import math</code> means 'load the math.py module so I can use what's in it.' You can also create your own modules — every <code>.py</code> file is one.",
+    trick: "<b>'Module = a .py file you can import.'</b>"
+  },
+  // Q26 — correct: D
+  { topic: "Modules",
+    q: `What is a Python package?`,
+    options: [
+      "A type of dictionary",
+      "Software you install from the App Store",
+      "A single function",
+      "A folder containing multiple Python modules grouped together",
+    ],
+    correct: 3,
+    explain: "A package is a folder/directory containing related modules. <code>os</code> and <code>os.path</code> — <code>os</code> is the package, <code>path</code> is a module inside it. You install third-party packages with <code>pip</code>.",
+    trick: "<b>'Module = file. Package = folder of modules.'</b>"
+  },
+  // Q27 — correct: A
+  { topic: "Modules",
+    q: `What does <code>pip install schedule</code> do?`,
+    options: [
+      "Installs the third-party 'schedule' package from PyPI (Python Package Index)",
+      "Schedules a pip update",
+      "Errors — pip isn't a real command",
+      "Schedules Python to run later",
+    ],
+    correct: 0,
+    explain: "<code>pip</code> is Python's package installer. <code>pip install &lt;name&gt;</code> downloads and installs a package from PyPI so you can <code>import</code> it. Common ones: <code>requests</code>, <code>schedule</code>, <code>boto3</code>, <code>paramiko</code>.",
+    trick: "<b>'pip install = grab a package off the internet.'</b>"
+  },
+  // Q28 — correct: D
+  { topic: "Modules",
+    q: `What's the 'standard library'?`,
+    options: [
+      "External packages you have to install",
+      "Library code stored in your repo",
+      "A list of variables",
+      "Modules that come built into Python — no pip install needed",
+    ],
+    correct: 3,
+    explain: "The standard library is the collection of modules that ship WITH Python. Examples: <code>os</code>, <code>sys</code>, <code>math</code>, <code>random</code>, <code>datetime</code>, <code>json</code>. Just <code>import</code> and use — no pip required.",
+    trick: "<b>'Standard library = batteries included.'</b> Already there."
+  },
+  // Q29 — correct: B
+  { topic: "Modules",
+    q: `Which of these are third-party libraries useful for IT automation?`,
+    options: [
+      "<code>os</code> and <code>sys</code>",
+      "<code>paramiko</code> (SSH) and <code>netmiko</code> (network device control)",
+      "<code>math</code> and <code>random</code>",
+      "Just <code>print</code> and <code>input</code>",
+    ],
+    correct: 1,
+    explain: "<code>os</code>, <code>sys</code>, <code>math</code>, <code>random</code> are standard library. <code>paramiko</code> and <code>netmiko</code> are third-party packages used heavily in network automation — install with <code>pip</code>.",
+    trick: "<b>'Standard = comes with Python. Third-party = pip install.'</b>"
+  },
+  // Q30 — correct: C
+  { topic: "Modules",
+    q: `What does the <code>filecmp</code> module do?`,
+    options: [
+      "Compresses files",
+      "Removes files",
+      "Compares files efficiently to check if they're the same",
+      "Encrypts files",
+    ],
+    correct: 2,
+    explain: "<code>filecmp</code> is a standard library module for comparing files and directories. Useful in automation: <code>filecmp.cmp(file1, file2)</code> returns True if they match. Faster than reading both files manually.",
+    trick: "<b>'filecmp = file compare.'</b> Quick same-or-different check."
+  },
+];
+
+
+let current = 0;
+let score = 0;
+let answered = 0;
+const userAnswers = [];
+
+const quizArea = document.getElementById('quizArea');
+const scoreDisplay = document.getElementById('scoreDisplay');
+const progressInfo = document.getElementById('progressInfo');
+const progressFill = document.getElementById('progressFill');
+
+function updateMeta() {
+  scoreDisplay.textContent = `${score} / ${answered}`;
+  progressInfo.textContent = current >= questions.length ? 'Complete' : `Question ${current + 1} of ${questions.length}`;
+  progressFill.style.width = `${(current / questions.length) * 100}%`;
+}
+
+function renderQuestion() {
+  if (current >= questions.length) { renderFinal(); return; }
+  if (current === 15 && !window._halfwayShown) { renderHalfway(); return; }
+  const q = questions[current];
+  updateMeta();
+  const html = `
+    <div class="question-card">
+      <div class="q-number">QUESTION ${current + 1} / 30<span class="q-topic">${q.topic}</span></div>
+      <div class="q-text">${q.q}</div>
+      <div class="options">
+        ${q.options.map((opt, i) => `
+          <button class="option" onclick="answer(${i})">
+            <span class="letter">${String.fromCharCode(97 + i)})</span>
+            <span>${opt}</span>
+          </button>
+        `).join('')}
+      </div>
+      <div id="feedbackBox"></div>
+    </div>
+  `;
+  quizArea.innerHTML = html;
+  setTimeout(() => {
+    const card = document.querySelector('.question-card');
+    if (card) window.scrollTo({ top: card.offsetTop - 20, behavior: 'smooth' });
+  }, 50);
+}
+
+function answer(idx) {
+  const q = questions[current];
+  const isCorrect = idx === q.correct;
+  if (isCorrect) score++;
+  answered++;
+  userAnswers.push({ idx: current, correct: isCorrect, topic: q.topic });
+
+  const buttons = document.querySelectorAll('.option');
+  buttons.forEach((btn, i) => {
+    btn.disabled = true;
+    if (i === q.correct) btn.classList.add('correct');
+    else if (i === idx) btn.classList.add('incorrect');
+    else btn.classList.add('faded');
+  });
+
+  const fb = document.getElementById('feedbackBox');
+  if (isCorrect) {
+    fb.innerHTML = `
+      <div class="feedback correct">
+        <div class="feedback-header">✓ CORRECT!</div>
+        <div class="feedback-body">${q.explain}</div>
+        <div class="memory-trick">
+          <span class="label">⚡ MEMORY TRICK</span>
+          ${q.trick}
+        </div>
+        <button class="next-btn" onclick="nextQuestion()">${current === questions.length - 1 ? 'See Results →' : 'Next Question →'}</button>
+      </div>
+    `;
+  } else {
+    fb.innerHTML = `
+      <div class="feedback incorrect">
+        <div class="feedback-header">✗ INCORRECT</div>
+        <div class="feedback-body">
+          <div><strong>Correct answer:</strong> ${String.fromCharCode(97 + q.correct)}) ${q.options[q.correct]}</div>
+          <div style="margin-top: 10px;">${q.explain}</div>
+        </div>
+        <div class="memory-trick">
+          <span class="label">⚡ MEMORY TRICK</span>
+          ${q.trick}
+        </div>
+        <button class="next-btn" onclick="nextQuestion()">${current === questions.length - 1 ? 'See Results →' : 'Next Question →'}</button>
+      </div>
+    `;
+  }
+  updateMeta();
+}
+
+function nextQuestion() { current++; renderQuestion(); }
+
+function renderHalfway() {
+  const pct = Math.round((score / answered) * 100);
+  const msg = pct >= 80 ? "Crushing it. Errors and files are next — keep the rhythm." :
+              pct >= 70 ? "Solid pace. The back half shifts to errors, files, and modules." :
+              pct >= 60 ? "Halfway. Take a breath before diving into error types — they overlap." :
+                          "Reset. Read each option twice — control flow keywords look similar.";
+  quizArea.innerHTML = `
+    <div class="summary-card">
+      <h2>▣ HALFWAY POINT</h2>
+      <div class="big-score">${score}/${answered}</div>
+      <div class="percent">${pct}%</div>
+      <p style="color: var(--text-dim); font-size: 13px; max-width: 480px; margin: 0 auto;">${msg}</p>
+      <button class="next-btn" onclick="continueQuiz()" style="margin-top: 24px;">Continue → Question 16</button>
+    </div>
+  `;
+}
+
+function continueQuiz() { window._halfwayShown = true; renderQuestion(); }
+
+function renderFinal() {
+  const pct = Math.round((score / questions.length) * 100);
+  updateMeta();
+  progressFill.style.width = '100%';
+
+  const topicStats = {};
+  userAnswers.forEach(a => {
+    if (!topicStats[a.topic]) topicStats[a.topic] = { right: 0, total: 0 };
+    topicStats[a.topic].total++;
+    if (a.correct) topicStats[a.topic].right++;
+  });
+
+  const strengths = [];
+  const weaknesses = [];
+  Object.entries(topicStats).forEach(([t, s]) => {
+    const p = s.right / s.total;
+    if (p >= 0.75) strengths.push(`${t} (${s.right}/${s.total})`);
+    else if (p < 0.6) weaknesses.push(`${t} (${s.right}/${s.total})`);
+  });
+
+  let verdict, color;
+  if (pct >= 85) { verdict = "PASS — STRONG"; color = 'var(--green)'; }
+  else if (pct >= 75) { verdict = "PASS"; color = 'var(--teal)'; }
+  else if (pct >= 65) { verdict = "BORDERLINE"; color = 'var(--amber)'; }
+  else { verdict = "NEEDS REVIEW"; color = 'var(--red)'; }
+
+  const studyGuide = [];
+  if (weaknesses.find(w => w.startsWith('Functions'))) {
+    studyGuide.push("Drill function vocab: parameter (placeholder) vs argument (actual value), positional vs keyword args, default values, *args/**kwargs, recursion needs a base case.");
+  }
+  if (weaknesses.find(w => w.startsWith('Control flow'))) {
+    studyGuide.push("Lock in control flow: if/elif/else (only one branch runs), for (iterate sequence), while (until condition flips). break exits, continue skips, pass does nothing.");
+  }
+  if (weaknesses.find(w => w.startsWith('Errors'))) {
+    studyGuide.push("Three error types: <strong>syntax</strong> (Python can't parse), <strong>runtime</strong> (crashes during execution), <strong>semantic</strong> (silently wrong output).");
+  }
+  if (weaknesses.find(w => w.startsWith('Debugging'))) {
+    studyGuide.push("Debug process: Understand → Isolate → Inspect (print or debugger) → Fix → Test. Print statements are a totally valid first step.");
+  }
+  if (weaknesses.find(w => w.startsWith('Files'))) {
+    studyGuide.push("File modes: 'r' read, 'w' WIPE then write (destructive!), 'a' append, 'b' binary. Always close files (or use 'with' to auto-close).");
+  }
+  if (weaknesses.find(w => w.startsWith('Modules'))) {
+    studyGuide.push("Module = .py file. Package = folder of modules. Standard library = built-in (math, os, random, json). Third-party = pip install (paramiko, netmiko, requests).");
+  }
+  if (studyGuide.length === 0) {
+    studyGuide.push("Strong coverage across functions, control flow, errors, and modules. You've covered all the major Python topics across these quizzes — solid foundation.");
+  }
+
+  quizArea.innerHTML = `
+    <div class="summary-card">
+      <h2>▣ QUIZ COMPLETE</h2>
+      <div class="big-score" style="color: ${color}">${score}/${questions.length}</div>
+      <div class="percent" style="color: ${color}">${pct}% · ${verdict}</div>
+
+      ${strengths.length ? `
+      <div class="section">
+        <h3>✓ STRENGTHS</h3>
+        <ul>${strengths.map(s => `<li>${s}</li>`).join('')}</ul>
+      </div>` : ''}
+
+      ${weaknesses.length ? `
+      <div class="section">
+        <h3>⚠ FOCUS AREAS</h3>
+        <ul>${weaknesses.map(s => `<li>${s}</li>`).join('')}</ul>
+      </div>` : ''}
+
+      <div class="section">
+        <h3>▸ TARGETED STUDY GUIDE</h3>
+        <ul>${studyGuide.map(s => `<li>${s}</li>`).join('')}</ul>
+      </div>
+
+      <button class="restart-btn" onclick="restart()">↻ RESTART QUIZ</button>
+    </div>
+  `;
+}
+
+function restart() {
+  current = 0; score = 0; answered = 0;
+  userAnswers.length = 0;
+  window._halfwayShown = false;
+  renderQuestion();
+}
+
+renderQuestion();
+</script>
+</body>
+</html>

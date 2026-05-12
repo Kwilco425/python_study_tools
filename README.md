@@ -33,8 +33,9 @@ It's the study tool I wished I had.
 | `quizzes/03-python-syntax-round2.html` | String methods deep dive (`.strip`, `.split`, `.join`, `.replace`), f-strings, `.format()`, number formatting, alignment, membership |
 | `quizzes/04-python-paradigms-and-builtins.html` | Programming paradigms (imperative, OOP, functional, declarative), built-in functions (`len`, `type`, `sum`, `range`, `sorted`, `any`/`all`, `dir`, `help`), variables, scope |
 | `quizzes/05-data-structures.html` | Lists, tuples, sets, dictionaries — definitions, when to use each, and the full method suite for each (`append` vs `extend`, `remove` vs `discard`, `pop`, `update`, `clear`) |
+| `quizzes/06-functions-control-flow-and-modules.html` | Functions deep dive (parameters vs arguments, defaults, `*args`, recursion); control flow (`if`/`elif`/`else`, `for`, `while`, `break`, `continue`, `pass`); error types (syntax, runtime, semantic); debugging process; file I/O; modules vs packages; standard library vs third-party |
 
-Each quiz is 30 questions and takes about 15–25 minutes.
+Each quiz is 30 questions and takes about 15–25 minutes. Six quizzes total, ~180 questions.
 
 ---
 
@@ -109,7 +110,6 @@ If you spot a factual error in a question, please open an issue! I'd rather fix 
 
 ## What's next
 
-- [ ] Round 5 (functions deep dive, control flow, error handling, file I/O, modules)
 - [ ] Spaced-repetition mode that re-asks missed questions a day later
 - [ ] Optional dark/light theme toggle
 - [ ] Question bank shuffling so retakes feel different
